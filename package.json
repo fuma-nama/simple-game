@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.0.4",
+    "@radix-ui/react-dialog": "^1.0.4",
     "@radix-ui/react-select": "^1.2.2",
     "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-toggle": "^1.0.3",
     "@types/node": "20.5.9",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
@@ -33,6 +35,7 @@
     "typescript": "5.2.2"
   },
   "devDependencies": {
-    "@types/react-canvas-draw": "^1.2.0"
+    "@types/react-canvas-draw": "^1.2.0",
+    "tailwindcss-animate": "^1.0.7"
   }
 }

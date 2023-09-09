@@ -23,6 +23,7 @@ import { useMemo } from "react";
 import { CompanyDraw } from "./draw";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Movingbox } from "./agree";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const form = useForm({
@@ -36,9 +37,12 @@ export default function Page() {
   const allowed_staffs = useMemo(() => {
     return Math.round(5000 * Math.random());
   }, []);
-
   const allowed_country = "SK";
-  const onSubmit = form.handleSubmit(() => {});
+
+  const router = useRouter();
+  const onSubmit = form.handleSubmit(() => {
+    router.push("/3");
+  });
 
   return (
     <>
