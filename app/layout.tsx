@@ -4,8 +4,15 @@ import { Inter } from "next/font/google";
 import { Provider } from "./provider";
 import { NavItem } from "@/components/nav-item";
 import { SidebarTrigger, SidebarContainer } from "@/components/sidebar";
-import { HomeIcon, BarChartIcon, Settings, Gamepad2Icon } from "lucide-react";
+import {
+  HomeIcon,
+  BarChartIcon,
+  Settings,
+  Gamepad2Icon,
+  GithubIcon,
+} from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -45,7 +52,16 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
           <Gamepad2Icon className="w-5 h-5 mr-1.5" />
           Simple Game
         </Link>
-        <SidebarTrigger className="ml-auto md:hidden" />
+        <Button size="icon" variant="ghost" className="ml-auto" asChild>
+          <a
+            href="https://github.com/SonMooSans/simple-game"
+            rel="noreferrer onopener"
+            target="_blank"
+          >
+            <GithubIcon className="w-5 h-5" />
+          </a>
+        </Button>
+        <SidebarTrigger className="md:hidden" />
       </nav>
       <div className="flex flex-row items-start gap-8 flex-1">
         <SidebarContainer>
