@@ -41,7 +41,7 @@ export default function Page() {
 
   const router = useRouter();
   const onSubmit = form.handleSubmit(() => {
-    router.push("/3");
+    router.push("/form/3");
   });
 
   return (

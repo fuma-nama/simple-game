@@ -34,6 +34,7 @@ const topics = [
 
 export default function Page() {
   const form = useForm({
+    reValidateMode: "onSubmit",
     defaultValues: {
       topic: undefined,
     },
