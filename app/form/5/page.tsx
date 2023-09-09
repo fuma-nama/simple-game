@@ -25,8 +25,8 @@ export default async function Page() {
             </Fragment>
           )
         )}
-        <PassForm />
       </Article>
+      <PassForm />
     </>
   );
 }
