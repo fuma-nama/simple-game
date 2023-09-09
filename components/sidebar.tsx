@@ -63,7 +63,7 @@ export function SidebarContainer({ children }: { children: ReactNode }) {
       allowPinchZoom={false}
       as="nav"
       className={cn(
-        "relative flex flex-col border bg-background rounded-lg md:w-[240px] max-md:fixed max-md:inset-0 max-md:p-4 max-md:overflow-auto",
+        "relative flex flex-col border bg-background rounded-lg md:w-[240px] md:h-[calc(100vh-9.5rem)] md:sticky md:top-8 max-md:fixed max-md:inset-0 max-md:p-4 max-md:overflow-auto",
         !isOpen && "max-md:hidden"
       )}
     >

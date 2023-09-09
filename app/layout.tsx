@@ -47,7 +47,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
         </Link>
         <SidebarTrigger className="ml-auto md:hidden" />
       </nav>
-      <div className="flex flex-row gap-8 flex-1">
+      <div className="flex flex-row items-start gap-8 flex-1">
         <SidebarContainer>
           <div className="flex flex-col px-2 py-4">
             <p className="font-semibold p-2 mb-4 md:hidden">Simple Game</p>

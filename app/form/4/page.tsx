@@ -140,6 +140,7 @@ export default function Page() {
                 >
                   {pictures.map(([label, src]) => (
                     <button
+                      type="button"
                       key={label}
                       onClick={() => onChange(label)}
                       className={cn(
