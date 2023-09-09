@@ -20,16 +20,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useMemo } from "react";
+import { CompanyDraw } from "./draw";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Movingbox } from "./agree";
 
 export default function Page() {
   const form = useForm({
     defaultValues: {
       country: undefined as string | undefined,
+      drawData: undefined as string | undefined,
       staffs: 0,
+      agree: false,
     },
   });
   const allowed_staffs = useMemo(() => {
-    return Math.round(1500 * Math.random());
+    return Math.round(5000 * Math.random());
   }, []);
 
   const allowed_country = "SK";
@@ -94,7 +99,8 @@ export default function Page() {
                   <Slider
                     value={[value]}
                     onValueChange={(v) => onChange(v[0])}
-                    max={1500}
+                    step={0.1}
+                    max={5000}
                     {...field}
                   />
                 </FormControl>
@@ -105,6 +111,52 @@ export default function Page() {
               </FormItem>
             )}
           />
+          <FormField
+            name="drawData"
+            control={form.control}
+            rules={{
+              validate: (v) => {
+                if (v === undefined || v.length === 0) return "Can't be empty";
+              },
+            }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Draw your Company</FormLabel>
+                <FormControl>
+                  <CompanyDraw onChange={field.onChange} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            name="agree"
+            control={form.control}
+            rules={{
+              validate: (v) => {
+                if (!v) return "You must agree to this";
+              },
+            }}
+            render={({ field: { value, onChange, ...field } }) => (
+              <FormItem>
+                <Movingbox className="flex flex-row gap-2 items-center data-[up=true]:-translate-y-8">
+                  <FormControl>
+                    <Checkbox
+                      checked={value}
+                      onCheckedChange={onChange}
+                      className="pointer-events-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormLabel className="pointer-events-none">
+                    Receive latest Information
+                  </FormLabel>
+                </Movingbox>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <Button>Submit</Button>
         </Form>
       </form>
