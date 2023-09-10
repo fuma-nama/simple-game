@@ -1,12 +1,18 @@
 "use client";
 import { Fragment, ReactNode, useEffect, useState } from "react";
 
-export function Article({ children }: { children: ReactNode }) {
+export function Article({
+  footer,
+  children,
+}: {
+  footer: ReactNode;
+  children: ReactNode;
+}) {
   const [repeated, setRepeated] = useState(1);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      if (window.scrollY > 0) window.scrollTo({ top: window.scrollY - 1 });
+      if (window.scrollY > 0) window.scrollTo({ top: window.scrollY - 10 });
     });
     const listener = () => {
       if (
@@ -26,12 +32,15 @@ export function Article({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <article className="mt-16">
-      {Array(repeated)
-        .fill(null)
-        .map((_, i) => (
-          <Fragment key={i}>{children}</Fragment>
-        ))}
-    </article>
+    <>
+      <article className="mt-16">
+        {Array(repeated)
+          .fill(null)
+          .map((_, i) => (
+            <Fragment key={i}>{children}</Fragment>
+          ))}
+      </article>
+      {repeated >= 10 && footer}
+    </>
   );
 }

@@ -5,6 +5,7 @@ import { PassForm } from "./form";
 
 export default async function Page() {
   const placeholder = data;
+  const words = placeholder.trim().split(/\s+/).length;
 
   return (
     <>
@@ -12,7 +13,7 @@ export default async function Page() {
       <p className="text-muted-foreground">
         You have to read this, even though you won't.
       </p>
-      <Article>
+      <Article footer={<PassForm wordsCount={words} />}>
         {["Using this services", "Service Provider", "Age Requirements"].map(
           (title) => (
             <Fragment key={title}>
@@ -26,7 +27,6 @@ export default async function Page() {
           )
         )}
       </Article>
-      <PassForm />
     </>
   );
 }

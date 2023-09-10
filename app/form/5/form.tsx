@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -12,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 
-export function PassForm() {
+export function PassForm({ wordsCount }: { wordsCount: number }) {
   const form = useForm({
     reValidateMode: "onSubmit",
     defaultValues: {
@@ -36,15 +37,16 @@ export function PassForm() {
               const num = Number(v);
 
               if (Number.isNaN(num)) return "Invalid value";
-              if (num != 983) return "Wrong Answer";
+              if (num != wordsCount) return "Wrong Answer";
             },
           }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Words Count</FormLabel>
+              <FormLabel>Words Count in the first paragraph</FormLabel>
               <FormControl>
                 <Input type="number" {...field} />
               </FormControl>
+              <FormDescription>Title not included</FormDescription>
               <FormMessage />
             </FormItem>
           )}
