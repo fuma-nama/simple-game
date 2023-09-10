@@ -148,7 +148,6 @@ export default function Page() {
                     <Checkbox
                       checked={value}
                       onCheckedChange={onChange}
-                      className="pointer-events-none"
                       {...field}
                     />
                   </FormControl>
