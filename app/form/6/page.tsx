@@ -70,22 +70,22 @@ export default function Page() {
     <div className="m-auto text-center">
       <h1 className="text-3xl font-bold mb-2">Last Question</h1>
       <p className="text-muted-foreground mb-4">???</p>
-      <div className="relative z-[2]">
-        <Button
-          className="absolute top-0 left-[50%] translate-x-[-50%] z-[-1]"
-          onClick={() => setStarted(true)}
-          disabled={started}
-        >
-          Submit
-        </Button>
+      <div className="relative">
         {started && (
           <Image
             alt="doge"
             src={StrongDogeImage}
             width={300}
-            className="animate-in fade-in duration-1000"
+            className="animate-in fade-in duration-1000 opacity-10"
+            draggable={false}
           />
         )}
+        <Button
+          className="absolute top-4 left-[50%] translate-x-[-50%]"
+          onClick={() => setStarted(true)}
+        >
+          {started ? "Broken" : "Submit"}
+        </Button>
         {windows.map((win, i) => (
           <WindowDialog key={i} {...win} />
         ))}

@@ -18,6 +18,7 @@ export function Nav() {
           4: "Fourth",
           5: "Fifth",
           6: "Last",
+          7: "???",
         }[num]
       }
       {" Step"}
