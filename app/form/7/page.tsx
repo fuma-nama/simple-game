@@ -32,13 +32,20 @@ export default function Page() {
     <>
       <Toaster toasts={toasts} />
       <NextImage alt="doge" src={StrongDogeImage} width={500} />
-      <Game />
+      {step > 2 && <Game />}
     </>
   );
 }
 
-type Object = { shouldDestroy(): boolean; render: () => void };
+type Object = {
+  lastAttackTime?: number;
+  isDestroyed?: boolean;
+  shouldDestroy(): boolean;
+  attack?: () => number;
+  render: () => void;
+};
 
+type Listener = { execute(): void };
 function Game() {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -48,17 +55,26 @@ function Game() {
     const ctx = element.getContext("2d")!;
     let mounted = true;
     let mouse: { x: number; y: number } | null = null;
+    let timers: Listener[] = [];
     let objects: Object[] = [];
+    let doge_hp = 100;
+    let hp = 100;
 
     element.width = window.outerWidth;
     element.height = window.outerHeight;
     let is_doge_attack = false;
+    let attack_bn: Object | null = null;
     const doge_attack = new Image(100, 95);
     const strong_doge = new Image(348, 300);
     const sword = new Image(493, 1920);
     strong_doge.src = "/strong_doge_attack.png";
     doge_attack.src = "/doge_attack.png";
     sword.src = "/sword.png";
+    const inter_font = (
+      document.body.computedStyleMap().get("font-family") ?? "Arial"
+    )
+      .toString()
+      .split(",")[0];
 
     const listener = (e: MouseEvent) => {
       mouse = { x: e.x, y: e.y };
@@ -67,27 +83,96 @@ function Game() {
     const next = () => {
       if (!mounted) return;
       ctx.clearRect(0, 0, element.width, element.height);
+      ctx.textBaseline = "top";
 
       if (mouse) {
-        ctx.fillStyle = "red";
-        ctx.fillRect(mouse.x - 10, mouse.y - 10, 20, 20);
+        ctx.strokeStyle = "white";
+        ctx.fillStyle = "#FF0000";
+        drawHeart(mouse.x - 10, mouse.y - 10, 20, 20);
       }
 
       const newObjects: Object[] = [];
       for (const object of objects) {
         object.render();
-        if (object.shouldDestroy()) continue;
+        const num = object.attack?.();
+        if (num != null && num > 0 && object.lastAttackTime == null) {
+          object.lastAttackTime = Date.now();
+          hp -= num;
+        }
+        if (object.shouldDestroy()) {
+          object.isDestroyed = true;
+          continue;
+        }
         newObjects.push(object);
       }
 
       objects = newObjects;
+
+      for (const timer of timers) {
+        timer.execute();
+      }
+
       requestAnimationFrame(next);
+    };
+
+    /**
+     * @param interval in milliseconds
+     */
+    const createTimer = (interval: number, callback: () => void) => {
+      const getNext = () => {
+        const next = new Date(Date.now());
+        next.setMilliseconds(next.getMilliseconds() + interval);
+        return next;
+      };
+      let next = getNext();
+
+      return {
+        execute: () => {
+          if (Date.now() >= next.getTime()) {
+            callback();
+            next = getNext();
+          }
+        },
+      };
+    };
+
+    const drawHeart = (x: number, y: number, w: number, h: number) => {
+      ctx.translate(x, y);
+      ctx.lineWidth = 1.0;
+
+      const d = Math.min(w, h);
+      ctx.beginPath();
+      ctx.moveTo(0, d / 4);
+      ctx.quadraticCurveTo(0, 0, d / 4, 0);
+      ctx.quadraticCurveTo(d / 2, 0, d / 2, d / 4);
+      ctx.quadraticCurveTo(d / 2, 0, (d * 3) / 4, 0);
+      ctx.quadraticCurveTo(d, 0, d, d / 4);
+      ctx.quadraticCurveTo(d, d / 2, (d * 3) / 4, (d * 3) / 4);
+      ctx.lineTo(d / 2, d);
+      ctx.lineTo(d / 4, (d * 3) / 4);
+      ctx.quadraticCurveTo(0, d / 2, 0, d / 4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.translate(-x, -y);
     };
 
     const createDogeAttack = (x: number, y: number): Object => {
       return {
         shouldDestroy() {
           return x >= element.width * 2;
+        },
+        attack() {
+          if (
+            inBoundingBox(
+              x - element.width,
+              y,
+              element.width,
+              doge_attack.height
+            )
+          )
+            return 10;
+          return 0;
         },
         render() {
           for (let i = 0; i < element.width; i += 100) {
@@ -99,6 +184,16 @@ function Game() {
       };
     };
 
+    function inBoundingBox(x: number, y: number, w: number, h: number) {
+      return (
+        mouse != null &&
+        mouse.x >= x &&
+        mouse.x <= x + w &&
+        mouse.y >= y &&
+        mouse.y <= y + h
+      );
+    }
+
     const createSwordAttack = (x: number, y: number): Object => {
       let delay = 50;
       let tick = 0;
@@ -107,6 +202,19 @@ function Game() {
       return {
         shouldDestroy() {
           return y >= sword.height * 2;
+        },
+        attack() {
+          if (
+            inBoundingBox(
+              x + offset,
+              y - sword.height,
+              sword.width - offset * 2,
+              sword.height
+            )
+          )
+            return 30;
+
+          return 0;
         },
         render() {
           delay--;
@@ -135,6 +243,11 @@ function Game() {
         shouldDestroy() {
           return x <= -strong_doge.width;
         },
+        attack() {
+          if (inBoundingBox(x, y, strong_doge.width, strong_doge.height))
+            return 30;
+          return 0;
+        },
         render() {
           ctx.drawImage(strong_doge, x, y);
           x -= element.width * 0.02;
@@ -147,12 +260,21 @@ function Game() {
         padding_y = 10;
       return {
         shouldDestroy() {
-          return false;
+          const metrics = ctx.measureText("Attack");
+          const pressed = inBoundingBox(
+            x,
+            y,
+            metrics.actualBoundingBoxRight + padding_x * 2,
+            metrics.actualBoundingBoxDescent + padding_y * 2
+          );
+
+          if (pressed) doge_hp -= 10;
+          return pressed;
         },
         render() {
-          ctx.textBaseline = "top";
-          ctx.font = "24px Arial";
-          const metrics = ctx.measureText("Attack");
+          ctx.font = `bold 16px ${inter_font}`;
+          const text = "Attack";
+          const metrics = ctx.measureText(text);
 
           ctx.fillStyle = "white";
           ctx.fillRect(
@@ -163,38 +285,94 @@ function Game() {
           );
 
           ctx.fillStyle = "black";
-          ctx.fillText("Attack", x + padding_x, y + padding_y);
+          ctx.fillText(text, x + padding_x, y + padding_y);
         },
       };
     };
 
-    objects.push(createAttackButton(0, 0));
-    const timer = setInterval(() => {
-      if (is_doge_attack) {
-        objects.push(createDogeAttack(0, mouse?.y ?? 0));
-      }
-      if (sword.complete && Math.random() > 0.5) {
-        objects.push(createSwordAttack(element.width * Math.random(), 0));
-      }
-      if (strong_doge.complete && Math.random() > 0.9) {
-        objects.push(createStrongDogeAttack(element.width, mouse?.y ?? 0));
-      }
-    }, 500);
+    const createUI = (): Object => {
+      return {
+        shouldDestroy() {
+          return false;
+        },
+        render() {
+          {
+            const x = element.width - 20 * 11,
+              y = element.height - 140;
 
-    const timer2 = setInterval(() => {
-      is_doge_attack = !is_doge_attack;
-    }, 2000);
+            let text = `${hp} HP`;
+            ctx.font = `bold 16px ${inter_font}`;
+            let metrics = ctx.measureText(text);
+            ctx.fillStyle = "white";
+            ctx.fillText(text, x, y);
+            ctx.translate(0, metrics.actualBoundingBoxDescent + 12);
+
+            ctx.strokeStyle = "black";
+            ctx.fillStyle = "red";
+            for (let i = 0; i * 10 < hp; i++) {
+              drawHeart(x + i * 20, y, 20, 20);
+            }
+
+            ctx.resetTransform();
+          }
+
+          // Doge HP
+          {
+            const w = 300;
+            ctx.fillStyle = "gray";
+            ctx.fillRect((element.width - w) / 2, 0, w, 20);
+            ctx.fillStyle = "red";
+            ctx.fillRect((element.width - w) / 2, 0, w * (doge_hp / 100), 20);
+          }
+        },
+      };
+    };
+
+    objects.push(createUI());
+    timers.push(
+      createTimer(500, () => {
+        if (is_doge_attack) {
+          objects.push(createDogeAttack(0, mouse?.y ?? 0));
+        }
+        if (strong_doge.complete && Math.random() > 0.9) {
+          objects.push(createStrongDogeAttack(element.width, mouse?.y ?? 0));
+        }
+      }),
+      createTimer(2000, () => {
+        is_doge_attack = !is_doge_attack;
+
+        if (sword.complete) {
+          objects.push(
+            createSwordAttack((element.width - sword.width) * Math.random(), 0)
+          );
+        }
+
+        if ((!attack_bn || attack_bn.isDestroyed) && Math.random() > 0.5) {
+          attack_bn = createAttackButton(
+            (element.width - 100) * Math.random(),
+            (element.height - 100) * Math.random()
+          );
+
+          objects.push(attack_bn);
+        }
+      })
+    );
 
     doge_attack.onload = next;
     window.addEventListener("mousemove", listener);
 
     return () => {
       mounted = false;
-      clearInterval(timer);
-      clearInterval(timer2);
       window.removeEventListener("mousemove", listener);
     };
   }, []);
 
-  return <canvas ref={ref} width={0} height={0} className="fixed inset-0" />;
+  return (
+    <canvas
+      ref={ref}
+      width={0}
+      height={0}
+      className="fixed inset-0 cursor-none"
+    />
+  );
 }
