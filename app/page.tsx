@@ -25,6 +25,12 @@ export default function Home() {
           getting started.
         </p>
       </Card>
+      <Card className="mt-4">
+        <h2 className="font-semibold text-lg mb-2">In Development</h2>
+        <p className="text-sm text-muted-foreground">
+          Feel free to support this project by pressing a star!
+        </p>
+      </Card>
     </>
   );
 }
