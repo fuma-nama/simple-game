@@ -70,11 +70,10 @@ function Game() {
     strong_doge.src = "/strong_doge_attack.png";
     doge_attack.src = "/doge_attack.png";
     sword.src = "/sword.png";
+
     const inter_font = (
-      document.body.computedStyleMap().get("font-family") ?? "Arial"
-    )
-      .toString()
-      .split(",")[0];
+      getComputedStyle(document.body).fontFamily ?? "Arial"
+    ).split(",")[0];
 
     const listener = (e: MouseEvent) => {
       mouse = { x: e.x, y: e.y };
