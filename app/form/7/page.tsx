@@ -160,24 +160,15 @@ function Game() {
     const createDogeAttack = (x: number, y: number): Object => {
       return {
         shouldDestroy() {
-          return x >= element.width * 2;
+          return x >= element.width;
         },
         attack() {
-          if (
-            inBoundingBox(
-              x - element.width,
-              y,
-              element.width,
-              doge_attack.height
-            )
-          )
+          if (inBoundingBox(x, y, doge_attack.width, doge_attack.height))
             return 10;
           return 0;
         },
         render() {
-          for (let i = 0; i < element.width; i += 100) {
-            ctx.drawImage(doge_attack, x + i - element.width, y);
-          }
+          ctx.drawImage(doge_attack, x, y);
 
           x += element.width * 0.01;
         },
@@ -197,7 +188,7 @@ function Game() {
     const createSwordAttack = (x: number, y: number): Object => {
       let delay = 50;
       let tick = 0;
-      const offset = 100;
+      const offset = 150;
 
       return {
         shouldDestroy() {
@@ -330,16 +321,17 @@ function Game() {
 
     objects.push(createUI());
     timers.push(
-      createTimer(500, () => {
+      createTimer(100, () => {
         if (is_doge_attack) {
           objects.push(createDogeAttack(0, mouse?.y ?? 0));
-        }
-        if (strong_doge.complete && Math.random() > 0.9) {
-          objects.push(createStrongDogeAttack(element.width, mouse?.y ?? 0));
         }
       }),
       createTimer(2000, () => {
         is_doge_attack = !is_doge_attack;
+
+        if (strong_doge.complete && Math.random() > 0.5) {
+          objects.push(createStrongDogeAttack(element.width, mouse?.y ?? 0));
+        }
 
         if (sword.complete) {
           objects.push(
