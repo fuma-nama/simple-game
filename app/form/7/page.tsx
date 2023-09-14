@@ -109,7 +109,7 @@ export default function Page() {
       {(level !== "default" || step > 2) && (
         <Game setEnd={(end) => setStep([0, end])} />
       )}
-      <Dialog open={level === "win" && win_texts[step] === null}>
+      <Dialog open={level === "win" && win_texts[step] === null && !isFade}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Submit Form</DialogTitle>
@@ -119,12 +119,12 @@ export default function Page() {
           </DialogHeader>
           <DialogFooter>
             <Button onClick={() => leave("/")}>Confirm</Button>
-
             <Button
               variant="secondary"
               onClick={() => {
                 if (step === win_texts.length - 1) {
                   leave("/form/happy_end");
+                  return;
                 }
 
                 setStep((prev) => [prev[0] + 1, prev[1]]);
