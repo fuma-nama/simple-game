@@ -2,13 +2,13 @@
 import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Toggle } from "@/components/ui/toggle";
+import { set } from "@/utils/cookie-manager";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
@@ -42,6 +42,9 @@ export default function Page() {
 
   const router = useRouter();
   const onSubmit = form.handleSubmit(() => {
+    set({
+      level: 4,
+    });
     router.push("/form/4");
   });
 

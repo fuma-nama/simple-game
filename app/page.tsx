@@ -1,22 +1,16 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import Link from "next/link";
+import { StartGame } from "./start_bn";
+import { cookies } from "next/headers";
+import { cookie_name } from "@/utils/cookie-manager";
 
 export default function Home() {
+  const cookie = cookies().get(cookie_name);
+
   return (
     <>
       <h1 className="font-bold text-4xl mb-2">Welcome Back</h1>
       <p className="text-muted-foreground">Test your patience</p>
-      <Card className="mt-8">
-        <h2 className="font-semibold text-lg mb-2">Getting Started</h2>
-        <p className="text-sm text-muted-foreground">
-          Hello our dear user, you have to complete a few forms in order to
-          start using our service.
-        </p>
-        <Button className="mt-6 max-sm:w-full" asChild>
-          <Link href="/form/1">Start</Link>
-        </Button>
-      </Card>
+      <StartGame started={cookie != null} />
       <Card className="mt-4">
         <h2 className="font-semibold text-lg mb-2">Prerequisites</h2>
         <p className="text-sm text-muted-foreground">

@@ -24,6 +24,7 @@ import { CompanyDraw } from "./draw";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Movingbox } from "./agree";
 import { useRouter } from "next/navigation";
+import { set } from "@/utils/cookie-manager";
 
 export default function Page() {
   const form = useForm({
@@ -41,6 +42,9 @@ export default function Page() {
 
   const router = useRouter();
   const onSubmit = form.handleSubmit(() => {
+    set({
+      level: 3,
+    });
     router.push("/form/3");
   });
 

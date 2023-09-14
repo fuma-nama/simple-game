@@ -15,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useId } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { set } from "@/utils/cookie-manager";
 
 const langs = [
   ["Kotlin", `println("Hello World")`],
@@ -41,6 +42,9 @@ export default function Page() {
   const router = useRouter();
   const onSubmit = form.handleSubmit(
     () => {
+      set({
+        level: 5,
+      });
       router.push("/form/5");
     },
     () => {

@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { set } from "@/utils/cookie-manager";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { useForm } from "react-hook-form";
@@ -18,6 +19,9 @@ export default function Page() {
   const errors = form.formState.errors;
 
   const onSubmit = form.handleSubmit(() => {
+    set({
+      level: 2,
+    });
     router.push("/form/2");
   });
 

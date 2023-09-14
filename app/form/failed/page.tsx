@@ -15,7 +15,7 @@ export default function Page({
       </h1>
       <p className="text-muted-foreground">{searchParams.description}</p>
       <Button className="w-fit mt-4">
-        <Link href="/">Try Again</Link>
+        <Link href="/form/1">Try Again</Link>
       </Button>
     </>
   );

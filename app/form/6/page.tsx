@@ -4,7 +4,8 @@ import StrongDogeImage from "@/public/strong_doge.png";
 import { Button } from "@/components/ui/button";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { cn } from "@/utils/cn";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { set } from "@/utils/cookie-manager";
 
 const texts = new Map<number, ReactNode>([
   [10, "Help me"],
@@ -13,16 +14,28 @@ const texts = new Map<number, ReactNode>([
   [13, "I don't want to be lonely anymore"],
   [14, "Are you here?"],
   [15, "Who are you?"],
-  [
-    4,
+  [4, <Content />],
+]);
+
+function Content() {
+  const router = useRouter();
+
+  const onClick = () => {
+    set({
+      level: 7,
+    });
+    router.push("/form/7");
+  };
+
+  return (
     <>
       <p>Don't press it, please</p>
-      <Button size="sm" className="mt-auto ml-auto" asChild>
-        <Link href="/form/7">Submit</Link>
+      <Button size="sm" className="mt-auto ml-auto" onClick={onClick}>
+        Submit
       </Button>
-    </>,
-  ],
-]);
+    </>
+  );
+}
 
 export default function Page() {
   const [started, setStarted] = useState(false);

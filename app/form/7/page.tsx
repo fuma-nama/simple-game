@@ -16,8 +16,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { set } from "@/utils/cookie-manager";
 
 const texts = [
   "Oh, my dear... You finally come?",
@@ -69,6 +69,14 @@ export default function Page() {
     });
   }, [step, level]);
 
+  const leave = (url: string) => {
+    setFade(true);
+    set({
+      level: 8,
+    });
+    setTimeout(() => router.push(url), 3000);
+  };
+
   return (
     <>
       {level === "lost" && (
@@ -110,16 +118,13 @@ export default function Page() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button asChild>
-              <Link href="/">Confirm</Link>
-            </Button>
+            <Button onClick={() => leave("/")}>Confirm</Button>
 
             <Button
               variant="secondary"
               onClick={() => {
                 if (step === win_texts.length - 1) {
-                  setFade(true);
-                  setTimeout(() => router.push("/form/happy_end"), 3000);
+                  leave("/form/happy_end");
                 }
 
                 setStep((prev) => [prev[0] + 1, prev[1]]);

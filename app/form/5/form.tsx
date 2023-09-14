@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { set } from "@/utils/cookie-manager";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
@@ -24,6 +25,9 @@ export function PassForm({ wordsCount }: { wordsCount: number }) {
 
   const router = useRouter();
   const onSubmit = form.handleSubmit(() => {
+    set({
+      level: 6,
+    });
     router.push("/form/6");
   });
 
