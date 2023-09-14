@@ -1,29 +1,34 @@
-import { Card } from "@/components/ui/card";
+import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { StartGame } from "./start_bn";
 import { cookies } from "next/headers";
-import { cookie_name } from "@/utils/cookie-manager";
+import { cookie_name, decode } from "@/utils/cookie-manager";
 
 export default function Home() {
   const cookie = cookies().get(cookie_name);
+  const data = cookie ? decode(cookie.value) : null;
 
   return (
     <>
       <h1 className="font-bold text-4xl mb-2">Welcome Back</h1>
-      <p className="text-muted-foreground">Test your patience</p>
-      <StartGame started={cookie != null} />
+      <p className="text-muted-foreground mb-8">Test your patience</p>
+      <StartGame
+        state={
+          data == null ? "default" : data.level === 8 ? "ended" : "started"
+        }
+      />
       <Card className="mt-4">
-        <h2 className="font-semibold text-lg mb-2">Prerequisites</h2>
-        <p className="text-sm text-muted-foreground">
+        <CardTitle>Prerequisites</CardTitle>
+        <CardDescription>
           This game requires hotkeys, as well as some hacky ways to win. Make
           sure you are on laptop/desktop, with a keyboard and mouse before
           getting started.
-        </p>
+        </CardDescription>
       </Card>
       <Card className="mt-4">
-        <h2 className="font-semibold text-lg mb-2">In Development</h2>
-        <p className="text-sm text-muted-foreground">
+        <CardTitle>In Development</CardTitle>
+        <CardDescription>
           Feel free to support this project by pressing a star!
-        </p>
+        </CardDescription>
       </Card>
     </>
   );

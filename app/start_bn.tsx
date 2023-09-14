@@ -1,10 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { set } from "@/utils/cookie-manager";
 import { useRouter } from "next/navigation";
 
-export function StartGame({ started }: { started: boolean }) {
+export function StartGame({
+  state,
+}: {
+  state: "ended" | "started" | "default";
+}) {
   const router = useRouter();
 
   const onContinue = () => {
@@ -12,7 +16,7 @@ export function StartGame({ started }: { started: boolean }) {
     router.push("/form/1");
   };
 
-  const onClick = () => {
+  const onNew = () => {
     set({
       level: 1,
     });
@@ -21,17 +25,31 @@ export function StartGame({ started }: { started: boolean }) {
     router.push("/form/1");
   };
 
-  if (started) {
+  if (state === "ended") {
     return (
-      <Card className="mt-8">
-        <h2 className="font-semibold text-lg mb-2">Continue Application</h2>
-        <p className="text-sm text-muted-foreground">
+      <Card>
+        <CardTitle>No Forms</CardTitle>
+        <CardDescription>
+          Welcome! You have submitted the application already.
+        </CardDescription>
+        <Button className="mt-6 max-sm:w-full" onClick={onNew}>
+          Reset
+        </Button>
+      </Card>
+    );
+  }
+
+  if (state === "started") {
+    return (
+      <Card>
+        <CardTitle>Continue Application</CardTitle>
+        <CardDescription>
           You have started an application earlier, please continue or restart
           it.
-        </p>
+        </CardDescription>
         <div className="flex flex-col gap-2 mt-6 sm:flex-row">
           <Button onClick={onContinue}>Continue</Button>
-          <Button onClick={onClick} variant="secondary">
+          <Button onClick={onNew} variant="secondary">
             New Game
           </Button>
         </div>
@@ -40,13 +58,13 @@ export function StartGame({ started }: { started: boolean }) {
   }
 
   return (
-    <Card className="mt-8">
-      <h2 className="font-semibold text-lg mb-2">Getting Started</h2>
-      <p className="text-sm text-muted-foreground">
+    <Card>
+      <CardTitle>Getting Started</CardTitle>
+      <CardDescription>
         Hello our dear user, you have to complete a few forms in order to start
         using our service.
-      </p>
-      <Button className="mt-6 max-sm:w-full" onClick={onClick}>
+      </CardDescription>
+      <Button className="mt-6 max-sm:w-full" onClick={onNew}>
         Start
       </Button>
     </Card>

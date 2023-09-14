@@ -17,3 +17,35 @@ export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
     );
   }
 );
+
+Card.displayName = "Card";
+
+export const CardTitle = forwardRef<
+  HTMLParagraphElement,
+  HTMLAttributes<HTMLParagraphElement>
+>((props, ref) => (
+  <p
+    {...props}
+    ref={ref}
+    className={cn("font-semibold text-lg mb-2", props.className)}
+  >
+    {props.children}
+  </p>
+));
+
+CardTitle.displayName = "CardTitle";
+
+export const CardDescription = forwardRef<
+  HTMLParagraphElement,
+  HTMLAttributes<HTMLParagraphElement>
+>((props, ref) => (
+  <p
+    {...props}
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", props.className)}
+  >
+    {props.children}
+  </p>
+));
+
+CardDescription.displayName = "CardDescription";
