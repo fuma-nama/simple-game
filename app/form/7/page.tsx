@@ -40,7 +40,7 @@ const win_texts = [
   null,
 ];
 
-type End = "win";
+type End = "win" | "lost";
 
 export default function Page() {
   const router = useRouter();
@@ -54,6 +54,7 @@ export default function Page() {
   useEffect(() => {
     const lines = {
       win: win_texts,
+      lost: [],
       default: texts,
     }[level];
 
@@ -70,6 +71,18 @@ export default function Page() {
 
   return (
     <>
+      {level === "lost" && (
+        <div className="fixed inset-0 z-50 bg-background flex flex-col text-center text-4xl font-bold items-center justify-center animate-in fade-in duration-2000">
+          You Died
+          <Button
+            size="lg"
+            className="mt-4"
+            onClick={() => setStep([0, "default"])}
+          >
+            Try Again
+          </Button>
+        </div>
+      )}
       {isFade && (
         <div className="fixed inset-0 z-50 bg-white animate-in fade-in duration-2000" />
       )}
@@ -79,6 +92,7 @@ export default function Page() {
         src={
           {
             win: StrongDogeCryImage,
+            lost: StrongDogeImage,
             default: StrongDogeImage,
           }[level]
         }
@@ -168,10 +182,16 @@ function Game({ setEnd }: { setEnd: (v: End) => void }) {
     };
 
     const next = () => {
-      if (!mounted) return;
+      if (!mounted || state === "lost") return;
+
       if (!state && doge_hp <= 0) {
         state = "win";
         setEnd("win");
+      }
+
+      if (!state && hp <= 0) {
+        state = "lost";
+        setEnd("lost");
       }
 
       tick++;
@@ -363,7 +383,7 @@ function Game({ setEnd }: { setEnd: (v: End) => void }) {
             metrics.actualBoundingBoxDescent + padding_y * 2
           );
 
-          if (pressed) doge_hp -= 100;
+          if (pressed) doge_hp -= 10;
           return pressed;
         },
         render() {
