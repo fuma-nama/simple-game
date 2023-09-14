@@ -31,10 +31,15 @@ function Developer() {
   });
 
   const onSubmit = form.handleSubmit((v) => {
+    const level = Number(v.level);
     set({
-      level: Number(v.level),
+      level: level,
     });
-    const path = `/form/${v.level}`;
+
+    // hide endings
+    if (level > 7) return;
+
+    const path = `/form/${level}`;
     router.prefetch(path);
     router.push(path);
   });
