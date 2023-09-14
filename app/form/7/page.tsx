@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const texts = [
   "Oh, my dear... You finally come?",
@@ -42,6 +43,8 @@ const win_texts = [
 type End = "win";
 
 export default function Page() {
+  const router = useRouter();
+  const [isFade, setFade] = useState(false);
   const [[step, level], setStep] = useState<[number, End | "default"]>([
     0,
     "default",
@@ -67,6 +70,9 @@ export default function Page() {
 
   return (
     <>
+      {isFade && (
+        <div className="fixed inset-0 z-50 bg-white animate-in fade-in duration-2000" />
+      )}
       <Toaster toasts={toasts} />
       <NextImage
         alt="doge"
@@ -81,7 +87,7 @@ export default function Page() {
       {(level !== "default" || step > 2) && (
         <Game setEnd={(end) => setStep([0, end])} />
       )}
-      <Dialog open={level === "win" && win_texts[step] == null}>
+      <Dialog open={level === "win" && win_texts[step] === null}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Submit Form</DialogTitle>
@@ -96,9 +102,16 @@ export default function Page() {
 
             <Button
               variant="secondary"
-              onClick={() => setStep((prev) => [prev[0] + 1, prev[1]])}
+              onClick={() => {
+                if (step === win_texts.length - 1) {
+                  setFade(true);
+                  setTimeout(() => router.push("/form/happy_end"), 3000);
+                }
+
+                setStep((prev) => [prev[0] + 1, prev[1]]);
+              }}
             >
-              {step >= win_texts.length
+              {step === win_texts.length - 1
                 ? "Help Doge"
                 : "Why don't you escape from here?"}
             </Button>
