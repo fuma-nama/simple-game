@@ -3,6 +3,7 @@
 import {
   Toast,
   ToastActionElement,
+  ToastClose,
   ToastDescription,
   ToastProps,
   ToastProvider,
@@ -29,6 +30,7 @@ export function Toaster({ toasts }: { toasts: ToasterToast[] }) {
                 <ToastDescription>{description}</ToastDescription>
               )}
             </div>
+            <ToastClose />
             {action}
           </Toast>
         );

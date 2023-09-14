@@ -10,12 +10,13 @@ type ToasterToast = ToastProps & {
 
 function useToast() {
   const [toasts, setToasts] = React.useState<ToasterToast[]>([]);
+  const idRef = React.useRef(0);
 
   const toast = React.useCallback((props: ToasterToast) => {
     setToasts((prev) => [...prev, props]);
   }, []);
 
-  return { toast, toasts };
+  return { idRef, toast, toasts };
 }
 
 export { useToast };

@@ -1,10 +1,22 @@
 "use client";
 import NextImage from "next/image";
 import StrongDogeImage from "@/public/strong_doge.png";
+import StrongDogeCryImage from "@/public/strong_doge_cry.png";
+
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/utils/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { ToastAction } from "@/components/ui/toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const texts = [
   "Oh, my dear... You finally come?",
@@ -12,27 +24,87 @@ const texts = [
   "Unfortunately, I can't let you go...",
 ];
 
+const win_texts = [
+  "Oh... my son, you win!",
+  "You can go now...",
+  "Submit your form and escape from here, forever",
+  "Goodbye...",
+  null,
+  "...Me?",
+  "I've been trapped here for countless years",
+  "I'm fine, I love to be lonely, as always",
+  "I tried to escape from here through the small hole of disk",
+  "I am tired... to keep struggling in this place",
+  "Maybe someday, I can fly on the wonderful sky, breathe fresh air, enjoy the freedom",
+  null,
+];
+
+type End = "win";
+
 export default function Page() {
-  const [step, setStep] = useState(0);
-  const { toast, toasts } = useToast();
+  const [[step, level], setStep] = useState<[number, End | "default"]>([
+    0,
+    "default",
+  ]);
+  const { idRef, toast, toasts } = useToast();
 
   useEffect(() => {
-    if (step >= texts.length) return;
+    const lines = {
+      win: win_texts,
+      default: texts,
+    }[level];
+
+    if (lines[step] == null) return;
     toast({
-      id: step.toString(),
-      description: texts[step],
+      id: (idRef.current++).toString(),
+      description: lines[step],
       onOpenChange(open) {
-        if (!open) setStep((prev) => prev + 1);
+        if (!open) setStep(([v, l]) => [v + 1, l]);
       },
       action: <ToastAction altText="Next">Next</ToastAction>,
     });
-  }, [step]);
+  }, [step, level]);
 
   return (
     <>
       <Toaster toasts={toasts} />
-      <NextImage alt="doge" src={StrongDogeImage} width={500} />
-      {step > 2 && <Game />}
+      <NextImage
+        alt="doge"
+        src={
+          {
+            win: StrongDogeCryImage,
+            default: StrongDogeImage,
+          }[level]
+        }
+        width={500}
+      />
+      {(level !== "default" || step > 2) && (
+        <Game setEnd={(end) => setStep([0, end])} />
+      )}
+      <Dialog open={level === "win" && win_texts[step] == null}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Submit Form</DialogTitle>
+            <DialogDescription>
+              End application and back to dashboard
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button asChild>
+              <Link href="/">Confirm</Link>
+            </Button>
+
+            <Button
+              variant="secondary"
+              onClick={() => setStep((prev) => [prev[0] + 1, prev[1]])}
+            >
+              {step >= win_texts.length
+                ? "Help Doge"
+                : "Why don't you escape from here?"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
@@ -46,7 +118,7 @@ type Object = {
 };
 
 type Listener = { execute(): void };
-function Game() {
+function Game({ setEnd }: { setEnd: (v: End) => void }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -54,11 +126,13 @@ function Game() {
     const element = ref.current;
     const ctx = element.getContext("2d")!;
     let mounted = true;
+    let state: End | undefined;
     let mouse: { x: number; y: number } | null = null;
     let timers: Listener[] = [];
     let objects: Object[] = [];
     let doge_hp = 100;
     let hp = 100;
+    let tick = 0;
 
     element.width = window.outerWidth;
     element.height = window.outerHeight;
@@ -80,27 +154,18 @@ function Game() {
       mouse = { x: e.x, y: e.y };
     };
 
-    let tick = 0;
     const next = () => {
       if (!mounted) return;
+      if (!state && doge_hp <= 0) {
+        state = "win";
+        setEnd("win");
+      }
+
       tick++;
+      if (tick === Number.MAX_VALUE) tick = 0;
+
       ctx.clearRect(0, 0, element.width, element.height);
       ctx.textBaseline = "top";
-
-      if (mouse) {
-        let color = "#FF0000";
-        if (
-          hurt_state_time != null &&
-          hurt_state_time >= Date.now() &&
-          Math.round(tick / 10) % 2 === 0
-        ) {
-          color = "#FF000030";
-        }
-
-        ctx.strokeStyle = "white";
-        ctx.fillStyle = color;
-        drawHeart(mouse.x - 10, mouse.y - 10, 20, 20);
-      }
 
       const newObjects: Object[] = [];
       for (const object of objects) {
@@ -144,6 +209,7 @@ function Game() {
 
       return {
         execute: () => {
+          if (state === "win") return;
           if (Date.now() >= next.getTime()) {
             callback();
             next = getNext();
@@ -204,7 +270,6 @@ function Game() {
 
     const createSwordAttack = (x: number, y: number): Object => {
       let delay = 50;
-      let tick = 0;
       const offset = 150;
 
       return {
@@ -228,8 +293,9 @@ function Game() {
           delay--;
           if (delay > 0) {
             ctx.fillStyle =
-              tick > 15 / 2 ? "rgba(255,0,0,0.1)" : "rgba(255,0,0,0.2)";
-            tick = tick > 15 ? 0 : tick + 1;
+              Math.round(tick / 10) % 2 === 0
+                ? "rgba(255,0,0,0.1)"
+                : "rgba(255,0,0,0.2)";
 
             ctx.fillRect(
               x + offset,
@@ -284,7 +350,7 @@ function Game() {
             metrics.actualBoundingBoxDescent + padding_y * 2
           );
 
-          if (pressed) doge_hp -= 10;
+          if (pressed) doge_hp -= 100;
           return pressed;
         },
         render() {
@@ -312,7 +378,7 @@ function Game() {
           return false;
         },
         render() {
-          {
+          if (!state) {
             const x = element.width - 20 * 11,
               y = element.height - 140;
 
@@ -333,7 +399,7 @@ function Game() {
           }
 
           // Doge HP
-          {
+          if (!state) {
             const w = 300;
             ctx.fillStyle = "gray";
             ctx.fillRect((element.width - w) / 2, 0, w, 20);
@@ -344,6 +410,22 @@ function Game() {
               Math.max(w * (doge_hp / 100), 0),
               20
             );
+          }
+
+          // mouse
+          if (mouse) {
+            let color = "#FF0000";
+            if (
+              hurt_state_time != null &&
+              hurt_state_time >= Date.now() &&
+              Math.round(tick / 10) % 2 === 0
+            ) {
+              color = "#FF000030";
+            }
+
+            ctx.strokeStyle = "white";
+            ctx.fillStyle = color;
+            drawHeart(mouse.x - 10, mouse.y - 10, 20, 20);
           }
         },
       };
