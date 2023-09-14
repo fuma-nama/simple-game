@@ -38,7 +38,7 @@ export default function Page() {
 }
 
 type Object = {
-  lastAttackTime?: number;
+  isAttacked?: boolean;
   isDestroyed?: boolean;
   shouldDestroy(): boolean;
   attack?: () => number;
@@ -64,6 +64,7 @@ function Game() {
     element.height = window.outerHeight;
     let is_doge_attack = false;
     let attack_bn: Object | null = null;
+    let hurt_state_time: number | null = null;
     const doge_attack = new Image(100, 95);
     const strong_doge = new Image(348, 300);
     const sword = new Image(493, 1920);
@@ -79,25 +80,41 @@ function Game() {
       mouse = { x: e.x, y: e.y };
     };
 
+    let tick = 0;
     const next = () => {
       if (!mounted) return;
+      tick++;
       ctx.clearRect(0, 0, element.width, element.height);
       ctx.textBaseline = "top";
 
       if (mouse) {
+        let color = "#FF0000";
+        if (
+          hurt_state_time != null &&
+          hurt_state_time >= Date.now() &&
+          Math.round(tick / 10) % 2 === 0
+        ) {
+          color = "#FF000030";
+        }
+
         ctx.strokeStyle = "white";
-        ctx.fillStyle = "#FF0000";
+        ctx.fillStyle = color;
         drawHeart(mouse.x - 10, mouse.y - 10, 20, 20);
       }
 
       const newObjects: Object[] = [];
       for (const object of objects) {
-        object.render();
         const num = object.attack?.();
-        if (num != null && num > 0 && object.lastAttackTime == null) {
-          object.lastAttackTime = Date.now();
+        if (num != null && num > 0 && !object.isAttacked) {
+          const end = new Date(Date.now());
+          end.setMilliseconds(end.getMilliseconds() + 1000);
+          hurt_state_time = end.getTime();
+
+          object.isAttacked = true;
           hp -= num;
         }
+
+        object.render();
         if (object.shouldDestroy()) {
           object.isDestroyed = true;
           continue;
@@ -157,6 +174,7 @@ function Game() {
     };
 
     const createDogeAttack = (x: number, y: number): Object => {
+      x -= doge_attack.width;
       return {
         shouldDestroy() {
           return x >= element.width;
@@ -234,7 +252,15 @@ function Game() {
           return x <= -strong_doge.width;
         },
         attack() {
-          if (inBoundingBox(x, y, strong_doge.width, strong_doge.height))
+          const offset_y = 50;
+          if (
+            inBoundingBox(
+              x,
+              y + offset_y,
+              strong_doge.width,
+              strong_doge.height - offset_y * 2
+            )
+          )
             return 30;
           return 0;
         },
@@ -312,7 +338,12 @@ function Game() {
             ctx.fillStyle = "gray";
             ctx.fillRect((element.width - w) / 2, 0, w, 20);
             ctx.fillStyle = "red";
-            ctx.fillRect((element.width - w) / 2, 0, w * (doge_hp / 100), 20);
+            ctx.fillRect(
+              (element.width - w) / 2,
+              0,
+              Math.max(w * (doge_hp / 100), 0),
+              20
+            );
           }
         },
       };
