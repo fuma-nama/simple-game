@@ -165,9 +165,6 @@ function Game({ setEnd }: { setEnd: (v: End) => void }) {
     let doge_hp = 100;
     let hp = 100;
     let tick = 0;
-
-    element.width = window.outerWidth;
-    element.height = window.outerHeight;
     let is_doge_attack = false;
     let attack_bn: Object | null = null;
     let hurt_state_time: number | null = null;
@@ -178,6 +175,8 @@ function Game({ setEnd }: { setEnd: (v: End) => void }) {
     doge_attack.src = "/doge_attack.png";
     sword.src = "/sword.png";
 
+    resize();
+
     const inter_font = (
       getComputedStyle(document.body).fontFamily ?? "Arial"
     ).split(",")[0];
@@ -185,6 +184,11 @@ function Game({ setEnd }: { setEnd: (v: End) => void }) {
     const listener = (e: MouseEvent) => {
       mouse = { x: e.x, y: e.y };
     };
+
+    function resize() {
+      element.width = document.documentElement.clientWidth;
+      element.height = document.documentElement.clientHeight;
+    }
 
     const next = () => {
       if (!mounted || state === "lost") return;
@@ -203,6 +207,7 @@ function Game({ setEnd }: { setEnd: (v: End) => void }) {
       if (tick === Number.MAX_VALUE) tick = 0;
 
       ctx.clearRect(0, 0, element.width, element.height);
+      resize();
       ctx.textBaseline = "top";
 
       const newObjects: Object[] = [];
@@ -312,7 +317,7 @@ function Game({ setEnd }: { setEnd: (v: End) => void }) {
 
       return {
         shouldDestroy() {
-          return y >= sword.height * 2;
+          return y >= element.height + sword.height;
         },
         attack() {
           if (
@@ -418,7 +423,7 @@ function Game({ setEnd }: { setEnd: (v: End) => void }) {
         render() {
           if (!state) {
             const x = element.width - 20 * 11,
-              y = element.height - 140;
+              y = element.height - 60;
 
             let text = `${hp} HP`;
             ctx.font = `bold 16px ${inter_font}`;
