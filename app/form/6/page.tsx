@@ -24,7 +24,7 @@ function Content() {
     set({
       level: 7,
     });
-    router.push("/form/7");
+    router.replace("/form/7");
   };
 
   return (

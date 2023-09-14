@@ -45,13 +45,13 @@ export default function Page() {
       set({
         level: 5,
       });
-      router.push("/form/5");
+      router.replace("/form/5");
     },
     () => {
       const params = new URLSearchParams({
         description: "Haha I caught you, robot",
       });
-      router.push("/form/failed?" + params);
+      router.replace("/form/failed?" + params);
     }
   );
 

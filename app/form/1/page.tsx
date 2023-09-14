@@ -22,7 +22,7 @@ export default function Page() {
     set({
       level: 2,
     });
-    router.push("/form/2");
+    router.replace("/form/2");
   });
 
   return (

@@ -28,7 +28,7 @@ export function PassForm({ wordsCount }: { wordsCount: number }) {
     set({
       level: 6,
     });
-    router.push("/form/6");
+    router.replace("/form/6");
   });
 
   return (

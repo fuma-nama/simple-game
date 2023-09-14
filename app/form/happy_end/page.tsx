@@ -16,7 +16,7 @@ export default function Page() {
   const router = useRouter();
 
   useEffect(() => {
-    if (text >= texts.length) router.push("/");
+    if (text >= texts.length) router.replace("/");
   }, [text]);
 
   return (

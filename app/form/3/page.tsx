@@ -45,7 +45,7 @@ export default function Page() {
     set({
       level: 4,
     });
-    router.push("/form/4");
+    router.replace("/form/4");
   });
 
   return (
@@ -158,7 +158,7 @@ function DogeBackground() {
         context.fillStyle = "rgba(255,0,0,0.2)";
         context.fillRect(0, 0, element.width, element.height);
         setTimeout(() => {
-          router.push("/form/failed?description=Doge ate your mouse");
+          router.replace("/form/failed?description=Doge ate your mouse");
         }, 500);
         return;
       }

@@ -28,7 +28,7 @@ export function NavItem({
   const active = pathname.startsWith(href + "/") || pathname === href;
 
   return (
-    <Link href="/" className={cn(navItem({ active }))}>
+    <Link href={href} className={cn(navItem({ active }))}>
       {children}
     </Link>
   );

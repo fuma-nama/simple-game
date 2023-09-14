@@ -74,7 +74,7 @@ export default function Page() {
     set({
       level: 8,
     });
-    setTimeout(() => router.push(url), 3000);
+    setTimeout(() => router.replace(url), 3000);
   };
 
   return (

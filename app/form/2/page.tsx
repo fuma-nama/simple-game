@@ -45,7 +45,7 @@ export default function Page() {
     set({
       level: 3,
     });
-    router.push("/form/3");
+    router.replace("/form/3");
   });
 
   return (
